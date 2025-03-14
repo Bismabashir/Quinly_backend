@@ -58,7 +58,7 @@ client = OpenAI(api_key=openai_api_key)
 #     return response.choices[0].message.content
 
 
-async def get_last_messages(conversation_id, limit=3):
+async def get_last_messages(conversation_id, limit=5):
     """Retrieve last few messages from a conversation for better context."""
     messages = await Message.objects.filter(conversation_id=conversation_id).order_by("-created_at")[:limit]
     return "\n".join([f"User: {msg.user_message}\nBot: {msg.bot_response}" for msg in messages if msg.user_message])
