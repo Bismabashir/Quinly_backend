@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from openai import OpenAI
 from django.conf import settings
 from .models import Message # added function from models file
+from channels.db import database_sync_to_async
 
 # Load environment variables
 load_dotenv()
@@ -58,9 +59,10 @@ client = OpenAI(api_key=openai_api_key)
 #     return response.choices[0].message.content
 
 
-async def get_last_messages(conversation_id, limit=5):
-    """Retrieve last few messages from a conversation for better context."""
-    messages = await Message.objects.filter(conversation_id=conversation_id).order_by("-created_at")[:limit]
+@database_sync_to_async
+def get_last_messages(conversation_id, limit=3):
+    """Retrieve last few messages from a conversation for better context (Sync Query for Django ORM)."""
+    messages = Message.objects.filter(conversation_id=conversation_id).order_by("-created_at")[:limit]
     return "\n".join([f"User: {msg.user_message}\nBot: {msg.bot_response}" for msg in messages if msg.user_message])
 
 async def generate_ai_response(user_message, topic, sentiment, is_premium, conversation_id):
@@ -88,7 +90,9 @@ async def generate_ai_response(user_message, topic, sentiment, is_premium, conve
         f"Detected Topic: {topic}\n"
         f"Sentiment Analysis: {sentiment}\n\n"
         f"{extra_instruction}\n\n"
-        f"Generate a thoughtful and structured response."
+        f"Generate a thoughtful and structured response. Keep it concise, friendly, and natural. "
+        f"Avoid repetition and unnecessary explanations. If the user acknowledges with a simple response like 'okay' or 'nice', keep your reply short and engaging."
+
     )
 
     response = client.chat.completions.create(
