@@ -47,55 +47,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.channel_name
         )
 
-    # async def receive(self, text_data):
-    #     data = json.loads(text_data)
-    #     user_message = data.get("message")
-    #     print(user_message)
-    #     is_premium = data.get("is_premium", False)
-
-    #     if not user_message:
-    #         await self.send(text_data=json.dumps({"error": "Message field is required."}))
-    #         return
-
-    #     sentiment = analyze_sentiment(user_message)
-    #     topic = detect_topic(user_message)
-
-    #     is_emergency = sentiment.lower() == "critical"
-
-    #     bot_response = generate_ai_response(user_message, topic, sentiment, is_premium)
-    #     print("Bottt",bot_response)
-       #######################################################
-        # await self.channel_layer.group_send(
-        #     self.room_group_name,
-        #     {
-        #         "type": "chat_message",
-        #         "sender": "user",
-        #         "user_message": user_message,
-        #         "bot_response": None,  # No bot response yet
-        #         "sentiment": sentiment,
-        #         "topic": topic,
-        #         "is_emergency": is_emergency,
-        #     }
-        
-        # )
-        ###########################################################
-        # await self.channel_layer.group_send(
-        #     self.room_group_name,
-        #     {
-        #         "type": "chat_message",
-        #         "user_message": None,
-        #         "bot_response": bot_response,
-        #         "sentiment": None,
-        #         "topic": None,
-        #         "is_emergency": is_emergency,
-        #     }
-        # )
-
-        # print("Messages forwarded")
-
-        # conversation = await self.get_conversation(self.conversation_id)
-        # await self.save_message(conversation, "user", user_message, None, sentiment, topic, is_emergency)
-        # await self.save_message(conversation, "bot", None, bot_response, None, None, False)
+    
     async def receive(self, text_data):
         data = json.loads(text_data)
         user_message = data.get("message")
@@ -107,14 +59,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         sentiment = analyze_sentiment(user_message)
         topic = detect_topic(user_message)
-
-        #  Check for grooming or self-harm risk
         is_emergency = sentiment.lower() == "critical" or topic.lower() in ["grooming", "self-harm", "abuse"]
-
-        # Generate AI response
         bot_response = await generate_ai_response(user_message, topic, sentiment, is_premium, self.conversation_id)
 
-        #  **Emergency Handling for Sensitive Topics**
         if topic.lower() == "grooming":
             bot_response = (
                 " This is serious. If someone is asking for pictures or making you uncomfortable online, **DO NOT** respond to them. "
@@ -130,7 +77,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 "If you're in immediate danger, please **call 999**. Would you like to talk about what’s on your mind?"
             )
 
-        # Send response
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -143,7 +89,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             }
         )
 
-        # Save messages to database
         conversation = await self.get_conversation(self.conversation_id)
         await self.save_message(conversation, "user", user_message, None, sentiment, topic, is_emergency)
         await self.save_message(conversation, "bot", None, bot_response, None, None, is_emergency)
