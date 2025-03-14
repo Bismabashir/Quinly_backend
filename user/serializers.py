@@ -3,6 +3,9 @@ from django.contrib.auth import get_user_model
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.utils.encoding import force_str
 from django.utils.http import urlsafe_base64_decode
+from rest_framework_simplejwt.tokens import AccessToken
+from django.utils.timezone import now
+from datetime import timedelta
 
 User = get_user_model()
 
@@ -52,10 +55,11 @@ class LoginSerializer(CustomSerializer):
         if not user.is_active:
             raise serializers.ValidationError("Your account is inactive. Please contact support.")
 
-        refresh = RefreshToken.for_user(user)
+        access_token = AccessToken.for_user(user)
+        access_token.set_exp(from_time=now() + timedelta(days=7))
         return {
-            "refresh": str(refresh),
-            "access": str(refresh.access_token),
+            "access": str(access_token),
+            "expires_in": access_token.payload["exp"],
             "user": UserSerializer(user).data
         }
 
