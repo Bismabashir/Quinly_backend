@@ -108,17 +108,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         sentiment = analyze_sentiment(user_message)
         topic = detect_topic(user_message)
 
-        # 🚨 Check for grooming or self-harm risk
+        #  Check for grooming or self-harm risk
         is_emergency = sentiment.lower() == "critical" or topic.lower() in ["grooming", "self-harm", "abuse"]
 
         # Generate AI response
         bot_response = await generate_ai_response(user_message, topic, sentiment, is_premium, self.conversation_id)
 
-        # 🆘 **Emergency Handling for Sensitive Topics**
+        #  **Emergency Handling for Sensitive Topics**
         if topic.lower() == "grooming":
             bot_response = (
-                "🚨 This is serious. If someone is asking for pictures or making you uncomfortable online, **DO NOT** respond to them. "
-                "🚨 **Block & report them immediately.** "
+                " This is serious. If someone is asking for pictures or making you uncomfortable online, **DO NOT** respond to them. "
+                " **Block & report them immediately.** "
                 "Here’s how you can report online abuse: [CEOP](https://www.ceop.police.uk), [NSPCC](https://www.nspcc.org.uk/), or talk to [Childline](https://www.childline.org.uk/). "
                 "You are not alone. Do you need more guidance on handling this?"
             )

@@ -5,7 +5,7 @@ from dotenv import load_dotenv
 from django.conf import settings
 # Load environment variables
 load_dotenv()
-openai_api_key = "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"
+openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
 
