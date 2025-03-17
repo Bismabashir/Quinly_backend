@@ -12,7 +12,7 @@ openai_api_key = os.getenv("OPENAI_API_KEY")
 client = OpenAI(api_key=openai_api_key)
 
 @database_sync_to_async
-def get_last_messages(conversation_id, limit=3):
+def get_last_messages(conversation_id, limit=6):
     messages = Message.objects.filter(conversation_id=conversation_id).order_by("-created_at")[:limit]
     return "\n".join([f"User: {msg.user_message}\nBot: {msg.bot_response}" for msg in messages if msg.user_message])
 
