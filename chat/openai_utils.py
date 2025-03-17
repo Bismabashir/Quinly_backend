@@ -40,6 +40,7 @@ async def generate_ai_response(user_message, topic, sentiment, is_premium, conve
         f"Sentiment Analysis: {sentiment}\n\n"
         f"{extra_instruction}\n\n"
         f"Generate a thoughtful and structured response. Keep it concise, friendly, and natural. "
+        f"Provide with extra relevant information if user asked for the tips or suggestions."
         f"Avoid repetition and unnecessary explanations. If the user acknowledges with a simple response like 'okay' or 'nice', keep your reply short and engaging."
 
     )
