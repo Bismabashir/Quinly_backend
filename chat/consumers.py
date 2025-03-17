@@ -59,22 +59,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         sentiment = analyze_sentiment(user_message)
         topic = detect_topic(user_message)
-        is_emergency = sentiment.lower() == "critical" or topic.lower() in ["grooming", "self-harm", "abuse"]
+        is_emergency = sentiment.lower() == "critical" or topic.lower() in ["grooming", "self-harm", "abuse", "suicidal thoughts", "harassment"]
         bot_response = await generate_ai_response(user_message, topic, sentiment, is_premium, self.conversation_id)
+        
 
-        if topic.lower() == "grooming":
+        if is_emergency:
             bot_response = (
-                " This is serious. If someone is asking for pictures or making you uncomfortable online, **DO NOT** respond to them. "
-                " **Block & report them immediately.** "
-                "Here’s how you can report online abuse: [CEOP](https://www.ceop.police.uk), [NSPCC](https://www.nspcc.org.uk/), or talk to [Childline](https://www.childline.org.uk/). "
-                "You are not alone. Do you need more guidance on handling this?"
-            )
-
-        elif topic.lower() == "self-harm":
-            bot_response = (
-                "💙 I'm really sorry you're feeling this way. You’re not alone, and there are people who care about you. "
-                "If you need someone to talk to, you can text **SHOUT to 85258** or call **Samaritans at 116 123** (available 24/7). "
-                "If you're in immediate danger, please **call 999**. Would you like to talk about what’s on your mind?"
+                "It sounds like you're dealing with a serious situation. Your safety is the priority. "
+                "If you ever feel unsafe or in immediate danger, please **call 999**. "
+                "You can also reach out for help at [NSPCC](https://www.nspcc.org.uk/), "
+                "[Childline](https://www.childline.org.uk/), or [Samaritans](https://www.samaritans.org/). "
+                "Would you like guidance on handling this situation?"
             )
 
         await self.channel_layer.group_send(
@@ -92,6 +87,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         conversation = await self.get_conversation(self.conversation_id)
         await self.save_message(conversation, "user", user_message, None, sentiment, topic, is_emergency)
         await self.save_message(conversation, "bot", None, bot_response, None, None, is_emergency)
+    
     async def chat_message(self, event):
         await self.send(text_data=json.dumps({
             "sender": "bot",
