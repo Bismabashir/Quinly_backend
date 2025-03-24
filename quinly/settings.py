@@ -27,7 +27,7 @@ SECRET_KEY = 'django-insecure-z&jc+qllv&rshc9w8wfj=alv6=1pk(&w-3w9#3l=c9&r*olnrl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost', "quinly-bot.onrender.com"]
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', "https://quinly-bot.onrender.com"]
 
 SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=7),
@@ -73,6 +73,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "https://quinly-frontend.netlify.app", 
 ]
 
 REST_FRAMEWORK = {
