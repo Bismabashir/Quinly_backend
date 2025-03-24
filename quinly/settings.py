@@ -73,7 +73,7 @@ MIDDLEWARE = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
-    "https://quinly-frontend.netlify.app", 
+    "https://quinly.netlify.app", 
 ]
 
 REST_FRAMEWORK = {
